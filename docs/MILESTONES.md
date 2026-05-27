@@ -54,7 +54,7 @@ Status: complete.
 
 - GitHub Releases workflow builds macOS, Linux, and Windows archives.
 - Checksums are generated and attested in release workflow.
-- Homebrew formula template is included.
+- Homebrew formula with release checksums is included.
 - Docker image workflow publishes `ghcr.io/marlonjd/graphgate`.
 - Composite GitHub Action is included.
 - macOS, Linux, Windows, Docker, and GitHub Action install docs are included.

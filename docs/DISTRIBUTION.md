@@ -3,7 +3,7 @@
 GraphGate distribution targets:
 
 - GitHub Releases with checksums and build provenance attestation.
-- Homebrew formula template in `packaging/homebrew/graphgate.rb`.
+- Homebrew formula in `packaging/homebrew/graphgate.rb`.
 - Docker image at `ghcr.io/marlonjd/graphgate`.
 - GitHub Action via `action.yml`.
 - Downloadable Windows `.exe` inside the Windows release archive.
@@ -21,9 +21,8 @@ Until the tap is published:
 go install github.com/MarlonJD/graphgate/cmd/graphgate@latest
 ```
 
-The Homebrew formula contains release checksum placeholders until the first
-published release. Replace each `sha256` value from the generated checksum file
-before publishing the tap.
+The Homebrew formula includes the `v0.1.0` release checksums. Copy it into the
+tap repository when publishing `marlonjd/tap/graphgate`.
 
 ## Linux
 
