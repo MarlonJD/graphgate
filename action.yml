@@ -5,6 +5,10 @@ inputs:
     description: GraphGate command to run.
     required: false
     default: validate
+  args:
+    description: Extra GraphGate command arguments.
+    required: false
+    default: ""
   config:
     description: Path to graphgate.yaml.
     required: false
@@ -19,15 +23,67 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: actions/setup-go@v5
-      with:
-        go-version: "1.22"
-    - shell: bash
-      run: go install github.com/MarlonJD/graphgate/cmd/graphgate@${{ inputs.version }}
     - shell: bash
       run: |
-        if [ "${{ inputs.command }}" = "diff" ]; then
-          graphgate diff --config "${{ inputs.config }}" --base "${{ inputs.base-schema }}"
+        set -euo pipefail
+
+        version="${{ inputs.version }}"
+        if [ "$version" = "latest" ]; then
+          latest_url="$(curl -fsSIL -o /dev/null -w '%{url_effective}' https://github.com/MarlonJD/graphgate/releases/latest)"
+          version="${latest_url##*/}"
+        fi
+
+        case "$RUNNER_OS" in
+          Linux) os="linux" ;;
+          macOS) os="darwin" ;;
+          Windows) os="windows" ;;
+          *)
+            echo "Unsupported runner OS: $RUNNER_OS" >&2
+            exit 1
+            ;;
+        esac
+
+        case "$RUNNER_ARCH" in
+          X64) arch="amd64" ;;
+          ARM64) arch="arm64" ;;
+          *)
+            echo "Unsupported runner architecture: $RUNNER_ARCH" >&2
+            exit 1
+            ;;
+        esac
+
+        if [ "$os" = "windows" ] && [ "$arch" != "amd64" ]; then
+          echo "Windows releases currently support amd64 only" >&2
+          exit 1
+        fi
+
+        asset="graphgate_${os}_${arch}.tar.gz"
+        tmp_dir="$(mktemp -d)"
+        bin_dir="${RUNNER_TEMP}/graphgate/bin"
+        mkdir -p "$bin_dir"
+
+        curl -fsSL -o "${tmp_dir}/${asset}" "https://github.com/MarlonJD/graphgate/releases/download/${version}/${asset}"
+        curl -fsSL -o "${tmp_dir}/checksums.txt" "https://github.com/MarlonJD/graphgate/releases/download/${version}/checksums.txt"
+        grep "  ${asset}$" "${tmp_dir}/checksums.txt" > "${tmp_dir}/checksums.one"
+
+        if command -v sha256sum >/dev/null 2>&1; then
+          (cd "$tmp_dir" && sha256sum -c checksums.one)
         else
-          graphgate "${{ inputs.command }}" --config "${{ inputs.config }}"
+          (cd "$tmp_dir" && shasum -a 256 -c checksums.one)
+        fi
+
+        tar -xzf "${tmp_dir}/${asset}" -C "$bin_dir"
+        echo "$bin_dir" >> "$GITHUB_PATH"
+    - shell: bash
+      run: |
+        set -euo pipefail
+        graphgate_bin="graphgate"
+        if [ "$RUNNER_OS" = "Windows" ]; then
+          graphgate_bin="graphgate.exe"
+        fi
+
+        if [ "${{ inputs.command }}" = "diff" ]; then
+          "$graphgate_bin" diff --config "${{ inputs.config }}" --base "${{ inputs.base-schema }}" ${{ inputs.args }}
+        else
+          "$graphgate_bin" "${{ inputs.command }}" --config "${{ inputs.config }}" ${{ inputs.args }}
         fi
