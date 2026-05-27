@@ -61,8 +61,9 @@ Status: complete.
 
 ## M6: EMSI Dogfood And REST Migration Mode
 
-Status: planned.
+Status: complete.
 
-- EMSI dogfood setup from an external GraphGate repo.
-- Example config for `emsi_go_api/internal/graph/schema.graphqls`.
-- REST-to-GraphQL parity diff path.
+- EMSI dogfood setup stays external and can live at `tools/graphgate/`.
+- Example config validates `emsi_go_api/internal/graph/schema.graphqls`.
+- Sample EMSI operations cover `cities`, `activeEmojis`, and `viewer`.
+- REST-to-GraphQL parity diff workflow is documented with mapping and response examples.

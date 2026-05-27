@@ -1,0 +1,27 @@
+{
+  "format": "graphgate",
+  "version": 1,
+  "operations": [
+    {
+      "id": "7271b5dd9751252c7fb4c0196d100955eb4f8c4e7bc92243e3f23e32660609ed",
+      "name": "EMSIActiveEmojis",
+      "file": "operations/ActiveEmojis.graphql",
+      "sha256": "7271b5dd9751252c7fb4c0196d100955eb4f8c4e7bc92243e3f23e32660609ed",
+      "body": "query EMSIActiveEmojis{\n\tactiveEmojis {\n\t\tid\n\t\tkey\n\t\tunified\n\t\ttextFallback\n\t\timageURL\n\t}\n}\n"
+    },
+    {
+      "id": "507b7726370cad3628afe5fb71720cdb987e3f4370f8b58eb1685baf9357f291",
+      "name": "EMSICities",
+      "file": "operations/Cities.graphql",
+      "sha256": "507b7726370cad3628afe5fb71720cdb987e3f4370f8b58eb1685baf9357f291",
+      "body": "query EMSICities{\n\tcities {\n\t\tid\n\t\tname\n\t}\n}\n"
+    },
+    {
+      "id": "7ab5616db8305ce11da097524a803e950945d40bd82663055a2d65494a34a945",
+      "name": "EMSIViewer",
+      "file": "operations/Viewer.graphql",
+      "sha256": "7ab5616db8305ce11da097524a803e950945d40bd82663055a2d65494a34a945",
+      "body": "query EMSIViewer{\n\tviewer {\n\t\tid\n\t\tusername\n\t\tfullName\n\t\trole\n\t}\n}\n"
+    }
+  ]
+}

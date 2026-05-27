@@ -1,0 +1,12 @@
+{
+  "items": [
+    {
+      "id": "istanbul",
+      "name": "Istanbul"
+    },
+    {
+      "id": "ankara",
+      "name": "Ankara"
+    }
+  ]
+}

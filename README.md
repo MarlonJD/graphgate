@@ -2,14 +2,14 @@
 
 Catch GraphQL contract breaks before they ship.
 
-GraphGate is a CLI-first GraphQL contract gate with a local web UI planned for a later milestone. It validates schemas, operation files, persisted operation manifests, and release compatibility in CI/CD before broken GraphQL contracts reach production.
+GraphGate is a CLI-first GraphQL contract gate with a local browser UI. It validates schemas, operation files, persisted operation manifests, and release compatibility in CI/CD before broken GraphQL contracts reach production.
 
 ## What It Is
 
 - A local-first CLI for GraphQL schema and operation validation.
 - A deterministic persisted-operation manifest generator.
 - A CI/CD gate with stable exit codes and machine-readable reports.
-- A future local browser UI started with `graphgate ui`.
+- A local browser UI started with `graphgate ui`.
 
 ## What It Is Not
 
@@ -96,7 +96,7 @@ reports:
   output: ./graphgate/reports
 ```
 
-See [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md) for the full M1 config reference.
+See [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md) for the full config reference.
 
 ## CI/CD Gate
 
@@ -132,6 +132,13 @@ graphgate ui
 
 The browser UI defaults to `http://localhost:4317`, reads the same config as the
 CLI, and never requires cloud login. See [docs/UI.md](docs/UI.md).
+
+## EMSI Dogfood
+
+GraphGate can be cloned beside EMSI at `tools/graphgate/` without vendoring it
+into the EMSI repository. The EMSI dogfood example validates
+`emsi_go_api/internal/graph/schema.graphqls` with sample operations. See
+[docs/EMSI_DOGFOOD.md](docs/EMSI_DOGFOOD.md).
 
 ## Distribution
 

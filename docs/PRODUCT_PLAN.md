@@ -1,6 +1,6 @@
 # Product Plan
 
-GraphGate is a CLI-first GraphQL contract gate with a local web UI planned for a later milestone.
+GraphGate is a CLI-first GraphQL contract gate with a local browser UI.
 
 ## Positioning
 
@@ -40,4 +40,4 @@ GraphiQL, Altair, and Apollo Explorer are excellent interactive exploration tool
 - Deterministic manifest generation and checking.
 - Operation impact reports for schema changes.
 - Local-first behavior with no required cloud login.
-- Future local browser UI for inspecting the same data produced by CLI runs.
+- Local browser UI for inspecting the same data produced by CLI runs.

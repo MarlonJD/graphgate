@@ -21,6 +21,10 @@ Until the tap is published:
 go install github.com/MarlonJD/graphgate/cmd/graphgate@latest
 ```
 
+The Homebrew formula contains release checksum placeholders until the first
+published release. Replace each `sha256` value from the generated checksum file
+before publishing the tap.
+
 ## Linux
 
 ```sh

@@ -34,7 +34,7 @@ List of operation file paths or glob patterns. `**` recursive globs are supporte
 
 ### `manifest.format`
 
-Manifest format identifier. M1 supports `graphgate`.
+Manifest format identifier. GraphGate supports `graphgate`.
 
 ### `manifest.output`
 
@@ -42,7 +42,7 @@ Path where `graphgate manifest` writes the deterministic persisted-operation man
 
 ### `environments`
 
-Named GraphQL endpoints for later contract test runner milestones. M1 preserves the shape but does not execute operations.
+Named GraphQL endpoints used by `graphgate test`.
 
 Headers may reference environment variables, for example `${GRAPHGATE_TOKEN}`.
 
