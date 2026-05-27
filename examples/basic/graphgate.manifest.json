@@ -1,0 +1,13 @@
+{
+  "format": "graphgate",
+  "version": 1,
+  "operations": [
+    {
+      "id": "449c1d9ee5779908c50a51aa9ca18929ac100875ccda814a062f84ec4f161989",
+      "name": "GetViewer",
+      "file": "operations/GetViewer.graphql",
+      "sha256": "449c1d9ee5779908c50a51aa9ca18929ac100875ccda814a062f84ec4f161989",
+      "body": "query GetViewer{\n\tviewer {\n\t\tid\n\t\tname\n\t}\n}\n"
+    }
+  ]
+}

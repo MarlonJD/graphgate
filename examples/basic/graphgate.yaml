@@ -1,0 +1,15 @@
+schema: ./schema.graphql
+operations:
+  - ./operations/**/*.graphql
+manifest:
+  format: graphgate
+  output: ./graphgate.manifest.json
+environments:
+  local:
+    endpoint: http://localhost:8080/graphql
+    headers:
+      Authorization: Bearer ${GRAPHGATE_TOKEN}
+tests:
+  fixtures: ./graphgate/fixtures/**/*.json
+reports:
+  output: ./graphgate/reports

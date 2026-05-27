@@ -1,0 +1,11 @@
+.DS_Store
+bin/
+dist/
+/graphgate
+coverage.out
+*.test
+
+web/node_modules/
+web/dist/
+
+graphgate/reports/

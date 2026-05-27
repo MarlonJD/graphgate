@@ -1,0 +1,81 @@
+package main
+
+import (
+	"bytes"
+	"os"
+	"path/filepath"
+	"testing"
+)
+
+func TestRunValidateInvalidOperationExitCode(t *testing.T) {
+	dir := newCLIProject(t, map[string]string{
+		"schema.graphql":               "type Query { viewer: String! }\n",
+		"operations/GetViewer.graphql": "query GetViewer { missing }\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"graphgate", "validate", "--config", filepath.Join(dir, "graphgate.yaml")}, &stdout, &stderr)
+	if code != exitInvalidOperation {
+		t.Fatalf("exit code = %d, want %d\nstderr=%s", code, exitInvalidOperation, stderr.String())
+	}
+}
+
+func TestRunManifestCheckMismatchExitCode(t *testing.T) {
+	dir := newCLIProject(t, map[string]string{
+		"schema.graphql":               "type Query { viewer: String! }\n",
+		"operations/GetViewer.graphql": "query GetViewer { viewer }\n",
+		"graphgate.manifest.json":      "{}\n",
+	})
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"graphgate", "manifest", "--config", filepath.Join(dir, "graphgate.yaml"), "--check"}, &stdout, &stderr)
+	if code != exitManifestMismatch {
+		t.Fatalf("exit code = %d, want %d\nstderr=%s", code, exitManifestMismatch, stderr.String())
+	}
+}
+
+func TestRunInitCreatesConfigAndDirectories(t *testing.T) {
+	dir := t.TempDir()
+	oldWD, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Chdir(oldWD); err != nil {
+			t.Fatalf("restore cwd: %v", err)
+		}
+	}()
+
+	var stdout, stderr bytes.Buffer
+	code := run([]string{"graphgate", "init"}, &stdout, &stderr)
+	if code != exitOK {
+		t.Fatalf("exit code = %d, want %d\nstderr=%s", code, exitOK, stderr.String())
+	}
+	for _, path := range []string{"graphgate.yaml", "operations", "graphgate/fixtures", "graphgate/reports"} {
+		if _, err := os.Stat(filepath.Join(dir, path)); err != nil {
+			t.Fatalf("%s not created: %v", path, err)
+		}
+	}
+}
+
+func newCLIProject(t *testing.T, files map[string]string) string {
+	t.Helper()
+	dir := t.TempDir()
+	for name, data := range files {
+		path := filepath.Join(dir, name)
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if err := os.WriteFile(path, []byte(data), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	cfg := []byte("schema: ./schema.graphql\noperations:\n  - ./operations/**/*.graphql\nmanifest:\n  format: graphgate\n  output: ./graphgate.manifest.json\n")
+	if err := os.WriteFile(filepath.Join(dir, "graphgate.yaml"), cfg, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	return dir
+}
