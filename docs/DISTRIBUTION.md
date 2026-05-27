@@ -21,8 +21,8 @@ Until the tap is published:
 go install github.com/MarlonJD/graphgate/cmd/graphgate@latest
 ```
 
-The Homebrew formula includes the `v0.1.0` release checksums. Copy it into the
-tap repository when publishing `marlonjd/tap/graphgate`.
+The Homebrew formula includes the `v0.1.0` release checksums and is published in
+`MarlonJD/homebrew-tap`.
 
 ## Linux
 

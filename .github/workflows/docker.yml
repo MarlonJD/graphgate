@@ -6,6 +6,10 @@ on:
       - main
     tags:
       - "v*"
+    paths-ignore:
+      - "docs/**"
+      - "README.md"
+      - "packaging/**"
 
 permissions:
   contents: read
