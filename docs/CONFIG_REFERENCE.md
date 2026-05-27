@@ -48,7 +48,7 @@ Headers may reference environment variables, for example `${GRAPHGATE_TOKEN}`.
 
 ### `tests.fixtures`
 
-Glob pattern for later fixture-based contract tests.
+Glob pattern for fixture-based contract tests used by `graphgate test`.
 
 ### `reports.output`
 
@@ -64,3 +64,5 @@ Default directory for generated reports.
 | 3 | Invalid schema |
 | 4 | Invalid operation |
 | 5 | Manifest mismatch |
+| 6 | Breaking schema change impacting operations |
+| 7 | Contract test failure |

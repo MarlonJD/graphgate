@@ -1,0 +1,33 @@
+name: GraphGate
+description: Validate GraphQL schemas, operations, manifests, and schema diffs in CI.
+inputs:
+  command:
+    description: GraphGate command to run.
+    required: false
+    default: validate
+  config:
+    description: Path to graphgate.yaml.
+    required: false
+    default: graphgate.yaml
+  base-schema:
+    description: Base schema path for graphgate diff.
+    required: false
+  version:
+    description: GraphGate version to install.
+    required: false
+    default: latest
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-go@v5
+      with:
+        go-version: "1.22"
+    - shell: bash
+      run: go install github.com/MarlonJD/graphgate/cmd/graphgate@${{ inputs.version }}
+    - shell: bash
+      run: |
+        if [ "${{ inputs.command }}" = "diff" ]; then
+          graphgate diff --config "${{ inputs.config }}" --base "${{ inputs.base-schema }}"
+        else
+          graphgate "${{ inputs.command }}" --config "${{ inputs.config }}"
+        fi

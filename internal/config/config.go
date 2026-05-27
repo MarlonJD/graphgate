@@ -21,6 +21,7 @@ const (
 )
 
 var ErrNoOperationMatches = errors.New("operation pattern matched no files")
+var ErrNoFixtureMatches = errors.New("fixture pattern matched no files")
 
 type Config struct {
 	Path         string                       `yaml:"-"`
@@ -161,11 +162,23 @@ func (c *Config) ReportsOutputPath() string {
 	return c.ResolvePath(c.Reports.Output)
 }
 
+func (c *Config) FixtureFiles() ([]string, error) {
+	if strings.TrimSpace(c.Tests.Fixtures) == "" {
+		return nil, errors.New("tests.fixtures is required")
+	}
+	files, err := c.matchFilePattern("fixture", c.Tests.Fixtures, ErrNoFixtureMatches)
+	if err != nil {
+		return nil, err
+	}
+	sort.Strings(files)
+	return files, nil
+}
+
 func (c *Config) OperationFiles() ([]string, error) {
 	seen := map[string]struct{}{}
 	var files []string
 	for _, pattern := range c.Operations {
-		matches, err := c.matchOperationPattern(pattern)
+		matches, err := c.matchFilePattern("operation", pattern, ErrNoOperationMatches)
 		if err != nil {
 			if errors.Is(err, ErrNoOperationMatches) {
 				continue
@@ -199,20 +212,20 @@ func (c *Config) applyDefaults() {
 	}
 }
 
-func (c *Config) matchOperationPattern(pattern string) ([]string, error) {
+func (c *Config) matchFilePattern(kind string, pattern string, noMatchesErr error) ([]string, error) {
 	pattern = strings.TrimSpace(pattern)
 	if pattern == "" {
-		return nil, errors.New("operation pattern cannot be empty")
+		return nil, fmt.Errorf("%s pattern cannot be empty", kind)
 	}
 
 	resolved := c.ResolvePath(pattern)
 	if !hasGlob(resolved) {
 		info, err := os.Stat(resolved)
 		if err != nil {
-			return nil, fmt.Errorf("operation file %q is not readable: %w", pattern, err)
+			return nil, fmt.Errorf("%s file %q is not readable: %w", kind, pattern, err)
 		}
 		if info.IsDir() {
-			return nil, fmt.Errorf("operation path %q is a directory", pattern)
+			return nil, fmt.Errorf("%s path %q is a directory", kind, pattern)
 		}
 		return []string{resolved}, nil
 	}
@@ -225,12 +238,12 @@ func (c *Config) matchOperationPattern(pattern string) ([]string, error) {
 		matches, err = filepath.Glob(resolved)
 	}
 	if err != nil {
-		return nil, fmt.Errorf("operation glob %q is invalid: %w", pattern, err)
+		return nil, fmt.Errorf("%s glob %q is invalid: %w", kind, pattern, err)
 	}
 
 	matches = fileMatches(matches)
 	if len(matches) == 0 {
-		return nil, fmt.Errorf("%w: %q", ErrNoOperationMatches, pattern)
+		return nil, fmt.Errorf("%w: %q", noMatchesErr, pattern)
 	}
 	sort.Strings(matches)
 	return matches, nil

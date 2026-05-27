@@ -1,0 +1,56 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.22"
+      - name: Build release binaries
+        shell: bash
+        run: |
+          mkdir -p dist
+          targets=(
+            "darwin arm64"
+            "darwin amd64"
+            "linux amd64"
+            "linux arm64"
+            "windows amd64"
+          )
+          for target in "${targets[@]}"; do
+            set -- $target
+            goos="$1"
+            goarch="$2"
+            ext=""
+            if [ "$goos" = "windows" ]; then ext=".exe"; fi
+            name="graphgate_${goos}_${goarch}"
+            CGO_ENABLED=0 GOOS="$goos" GOARCH="$goarch" go build -trimpath -ldflags="-s -w" -o "dist/${name}/graphgate${ext}" ./cmd/graphgate
+            tar -C "dist/${name}" -czf "dist/${name}.tar.gz" .
+            rm -rf "dist/${name}"
+          done
+      - name: Generate checksums
+        shell: bash
+        run: |
+          cd dist
+          sha256sum *.tar.gz > checksums.txt
+      - name: Sign checksums with GitHub attestations
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: dist/checksums.txt
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/checksums.txt

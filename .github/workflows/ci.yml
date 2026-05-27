@@ -16,3 +16,12 @@ jobs:
           go-version: "1.22"
       - run: go test ./...
       - run: go build ./cmd/graphgate
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+      - run: go run ./cmd/graphgate validate --config examples/basic/graphgate.yaml
+      - run: go run ./cmd/graphgate manifest --config examples/basic/graphgate.yaml --check

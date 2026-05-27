@@ -10,7 +10,6 @@ import (
 	"sort"
 
 	"github.com/MarlonJD/graphgate/internal/config"
-	"github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 	"github.com/vektah/gqlparser/v2/formatter"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -20,7 +19,10 @@ import (
 
 func ValidateProject(cfg *config.Config) (ValidationResult, error) {
 	result := ValidationResult{
-		Schema: cfg.RelativePath(cfg.ResolvePath(cfg.Schema)),
+		Schema:         cfg.RelativePath(cfg.ResolvePath(cfg.Schema)),
+		OperationFiles: []string{},
+		Operations:     []Operation{},
+		Issues:         []Issue{},
 	}
 
 	schema, schemaIssues, err := loadSchema(cfg)
@@ -55,24 +57,6 @@ func ValidateProject(cfg *config.Config) (ValidationResult, error) {
 	})
 
 	return result, nil
-}
-
-func loadSchema(cfg *config.Config) (*ast.Schema, []Issue, error) {
-	path := cfg.ResolvePath(cfg.Schema)
-	data, err := os.ReadFile(path)
-	if err != nil {
-		return nil, nil, fmt.Errorf("read schema %q: %w", cfg.Schema, err)
-	}
-
-	schema, err := gqlparser.LoadSchema(&ast.Source{
-		Name:  cfg.RelativePath(path),
-		Input: string(data),
-	})
-	if err == nil {
-		return schema, nil, nil
-	}
-
-	return nil, issuesFromError(CodeInvalidSchema, cfg.RelativePath(path), "", err), nil
 }
 
 func validateOperationFile(cfg *config.Config, schema *ast.Schema, file string, seenNames map[string]string) ([]Operation, []Issue) {

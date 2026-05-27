@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>GraphGate</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>GraphGate</h1>
+          <p>Local GraphQL contract gate</p>
+        </div>
+        <div id="status" class="status">Loading</div>
+      </header>
+
+      <nav class="tabs" aria-label="GraphGate views">
+        <button data-tab="dashboard" class="active">Dashboard</button>
+        <button data-tab="operations">Operations</button>
+        <button data-tab="schema">Schema</button>
+        <button data-tab="manifest">Manifest</button>
+        <button data-tab="diff">Diff</button>
+        <button data-tab="tests">Test Runs</button>
+        <button data-tab="reports">Reports</button>
+      </nav>
+
+      <section id="view"></section>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>

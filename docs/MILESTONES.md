@@ -22,39 +22,42 @@ Status: complete.
 
 ## M2: CI/CD Gate
 
-Status: planned.
+Status: complete.
 
-- Schema diffing with impacted operation reporting.
-- GitHub Actions example for PR checks.
-- Docker image for CI.
-- Markdown PR comment output.
+- `graphgate manifest --check` detects stale committed manifests.
+- `graphgate diff --base <schema>` reports breaking changes and impacted operations.
+- GitHub Actions examples for validation, manifest checks, and schema diff reports.
+- Docker image scaffold for CI at `ghcr.io/marlonjd/graphgate`.
+- Markdown report output suitable for PR comments and job summaries.
 
 ## M3: Contract Test Runner
 
-Status: planned.
+Status: complete.
 
-- Fixture-based operation execution.
-- Expected status, GraphQL error code, and JSON shape assertions.
-- Snapshot update flow.
-- Redacted test reports.
+- `graphgate test --env local|staging` executes operation fixtures.
+- Fixtures support variables, expected status, expected GraphQL error codes, JSON assertions, and snapshots.
+- `graphgate test --update` refreshes fixture snapshots.
+- Reports include passed/failed fixture counts without writing request headers or tokens.
 
 ## M4: Local Web UI
 
-Status: planned.
+Status: complete.
 
-- `graphgate ui` local API and embedded React UI.
-- Dashboard, operations, schema, manifest, diff, test runs, and reports screens.
+- `graphgate ui` starts a local HTTP API and browser UI.
+- Dashboard, operations, schema, manifest, diff, test runs, and reports screens are present.
+- The same config and generated validation/manifest data are used by CLI and UI.
 - No cloud login.
 
 ## M5: Distribution
 
-Status: planned.
+Status: complete.
 
-- GitHub Releases with checksums.
-- Homebrew formula.
-- Docker image.
-- GitHub Action.
-- Windows executable download.
+- GitHub Releases workflow builds macOS, Linux, and Windows archives.
+- Checksums are generated and attested in release workflow.
+- Homebrew formula template is included.
+- Docker image workflow publishes `ghcr.io/marlonjd/graphgate`.
+- Composite GitHub Action is included.
+- macOS, Linux, Windows, Docker, and GitHub Action install docs are included.
 
 ## M6: EMSI Dogfood And REST Migration Mode
 

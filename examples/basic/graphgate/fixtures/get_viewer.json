@@ -1,0 +1,17 @@
+{
+  "name": "viewer smoke",
+  "operation": "GetViewer",
+  "variables": {},
+  "expectedStatus": 200,
+  "expectedErrorCodes": [],
+  "assertions": [
+    {
+      "path": "data.viewer.id",
+      "type": "string"
+    },
+    {
+      "path": "data.viewer.name",
+      "type": "string"
+    }
+  ]
+}

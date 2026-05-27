@@ -35,7 +35,11 @@ go run ./cmd/graphgate validate
 graphgate init
 graphgate validate
 graphgate manifest
+graphgate manifest --check
+graphgate diff --base schema.base.graphql
+graphgate test --env local
 graphgate report --format markdown
+graphgate ui
 ```
 
 `graphgate init` creates:
@@ -52,15 +56,10 @@ graphgate init
 graphgate validate
 graphgate manifest
 graphgate manifest --check
+graphgate diff --base schema.base.graphql
+graphgate test --env local
 graphgate report --format markdown
 graphgate report --format json
-```
-
-Planned later:
-
-```sh
-graphgate diff
-graphgate test
 graphgate ui
 ```
 
@@ -74,6 +73,8 @@ graphgate ui
 | 3 | Invalid schema |
 | 4 | Invalid operation |
 | 5 | Manifest mismatch |
+| 6 | Breaking schema change impacting operations |
+| 7 | Contract test failure |
 
 ## Configuration
 
@@ -96,6 +97,46 @@ reports:
 ```
 
 See [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md) for the full M1 config reference.
+
+## CI/CD Gate
+
+GraphGate can fail CI when operations no longer validate, when the persisted
+manifest is stale, or when a schema diff impacts committed operations:
+
+```sh
+graphgate validate
+graphgate manifest --check
+graphgate diff --base schema.base.graphql
+```
+
+See [docs/CI.md](docs/CI.md) for GitHub Actions examples and PR-comment-ready
+markdown reports.
+
+## Contract Tests
+
+```sh
+graphgate test --env local
+graphgate test --env staging --format json
+graphgate test --env local --update
+```
+
+Fixtures support variables, expected HTTP status, expected GraphQL error codes,
+JSON shape assertions, and snapshots. See
+[docs/CONTRACT_TESTS.md](docs/CONTRACT_TESTS.md).
+
+## Local Web UI
+
+```sh
+graphgate ui
+```
+
+The browser UI defaults to `http://localhost:4317`, reads the same config as the
+CLI, and never requires cloud login. See [docs/UI.md](docs/UI.md).
+
+## Distribution
+
+Install targets include GitHub Releases, Homebrew, Docker, GitHub Actions, and a
+downloadable Windows executable. See [docs/DISTRIBUTION.md](docs/DISTRIBUTION.md).
 
 ## License
 
