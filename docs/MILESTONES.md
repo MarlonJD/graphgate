@@ -6,7 +6,7 @@ Status: complete.
 
 - Product positioning and README.
 - Product plan, milestone roadmap, and config reference.
-- MIT license.
+- AGPL-3.0-or-later license.
 - Repository hygiene and basic CI.
 
 ## M1: CLI Core

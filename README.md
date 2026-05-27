@@ -99,4 +99,9 @@ See [docs/CONFIG_REFERENCE.md](docs/CONFIG_REFERENCE.md) for the full M1 config 
 
 ## License
 
-MIT
+Copyright (C) 2026 Burak Karahan.
+
+GraphGate is licensed under the GNU Affero General Public License v3.0 or later
+(`AGPL-3.0-or-later`). The project uses AGPL to keep GraphGate local-first and
+open while making sure meaningful forks and service-based variants share their
+source changes with the community.
