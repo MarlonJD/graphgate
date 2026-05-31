@@ -1,0 +1,93 @@
+query EMSIAdminApplicationDetail($id: ID!) {
+  adminApplicationDetail(id: $id) {
+    id
+    applicant {
+      id
+      username
+      displayName
+      city
+      membershipState
+      applicationState
+      roleLabels
+      visibility {
+        field
+        state
+        canReveal
+        reasonRequired
+        auditAction
+      }
+    }
+    state
+    city
+    submittedAt
+    updatedAt
+    nextActionOwner
+    shortMotivationPreview
+    answers {
+      key
+      label
+      value
+      valueType
+      group
+      displayOrder
+      required
+      sensitive
+    }
+    answerGroups {
+      group
+      answers {
+        key
+        label
+        value
+        valueType
+        group
+        displayOrder
+        required
+        sensitive
+      }
+    }
+    applicantCopy
+    internalNotes {
+      body
+      createdAt
+    }
+    applicantMessages {
+      body
+      createdAt
+    }
+    decisionHistory {
+      id
+      actorUserID
+      actorUsername
+      action
+      targetType
+      targetID
+      previousState
+      newState
+      reason
+      createdAt
+    }
+    audit {
+      id
+      actorUserID
+      actorUsername
+      action
+      targetType
+      targetID
+      previousState
+      newState
+      reason
+      createdAt
+    }
+    allowedActions {
+      action
+      label
+      riskLevel
+      requiresReason
+      requiresUserVisibleMessage
+      createsProposal
+      requiresConfirmation
+      disabledReason
+    }
+  }
+}

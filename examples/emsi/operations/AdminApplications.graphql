@@ -1,0 +1,29 @@
+query EMSIAdminApplications($state: String, $limit: Int = 100) {
+  adminApplications(state: $state, limit: $limit) {
+    limit
+    items {
+      id
+      applicant {
+        id
+        username
+        displayName
+        city
+        membershipState
+        applicationState
+        visibility {
+          field
+          state
+          canReveal
+          reasonRequired
+          auditAction
+        }
+      }
+      state
+      city
+      submittedAt
+      updatedAt
+      nextActionOwner
+      shortMotivationPreview
+    }
+  }
+}

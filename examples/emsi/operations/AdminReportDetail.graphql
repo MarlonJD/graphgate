@@ -1,0 +1,129 @@
+query EMSIAdminReportDetail($id: ID!) {
+  adminReportDetail(id: $id) {
+    id
+    category
+    state
+    riskLevel
+    targetType
+    targetID
+    targetTitle
+    targetPreviewSummary
+    createdAt
+    relatedReportCount
+    reporter {
+      field
+      state
+      canReveal
+      reasonRequired
+      auditAction
+    }
+    details
+    targetPreview {
+      targetType
+      targetID
+      title
+      subtitle
+      bodyPreview
+      mediaPreview
+      state
+      sensitivity
+      revealState {
+        field
+        state
+        canReveal
+        reasonRequired
+        auditAction
+      }
+      owner {
+        id
+        username
+        displayName
+        city
+        membershipState
+        applicationState
+        visibility {
+          field
+          state
+          canReveal
+          reasonRequired
+          auditAction
+        }
+      }
+    }
+    targetOwner {
+      id
+      username
+      displayName
+      city
+      membershipState
+      applicationState
+      visibility {
+        field
+        state
+        canReveal
+        reasonRequired
+        auditAction
+      }
+    }
+    reporterRevealState {
+      field
+      state
+      canReveal
+      reasonRequired
+      auditAction
+    }
+    relatedReports {
+      id
+      category
+      state
+      createdAt
+    }
+    blockHistory {
+      active
+      reason
+      createdAt
+      updatedAt
+    }
+    moderationHistory {
+      id
+      actorUserID
+      actorUsername
+      action
+      targetType
+      targetID
+      previousState
+      newState
+      reason
+      createdAt
+    }
+    sensitiveContentRevealState {
+      field
+      state
+      canReveal
+      reasonRequired
+      auditAction
+    }
+    audit {
+      id
+      actorUserID
+      actorUsername
+      action
+      targetType
+      targetID
+      previousState
+      newState
+      reason
+      createdAt
+    }
+    allowedActions {
+      action
+      label
+      riskLevel
+      requiresReason
+      requiresUserVisibleMessage
+      createsProposal
+      requiresConfirmation
+      disabledReason
+    }
+  }
+}

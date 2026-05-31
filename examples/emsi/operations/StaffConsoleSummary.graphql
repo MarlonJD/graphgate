@@ -1,0 +1,53 @@
+query EMSIStaffConsoleSummary {
+  staffConsoleSummary {
+    applications {
+      pending
+      total
+    }
+    reports {
+      pending
+      total
+    }
+    feedback {
+      pending
+      total
+    }
+    orientation {
+      pending
+      total
+    }
+    stories {
+      pending
+      total
+    }
+    actionProposals {
+      pending
+      total
+    }
+    intakes {
+      pending
+      total
+    }
+    cityOps {
+      pending
+      total
+    }
+    sessions {
+      pending
+      total
+    }
+    permissions {
+      permission
+      scope
+    }
+    modules {
+      id
+      title
+      systemImage
+      permission
+      scope
+      pending
+      total
+    }
+  }
+}

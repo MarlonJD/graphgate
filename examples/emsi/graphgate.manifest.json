@@ -10,6 +10,34 @@
       "body": "query EMSIActiveEmojis{\n\tactiveEmojis {\n\t\tid\n\t\tkey\n\t\tunified\n\t\ttextFallback\n\t\timageURL\n\t}\n}\n"
     },
     {
+      "id": "8c2992fb3b3f1387ff4d7752d902c31c50b33263730d8b61e2718a9f41af705e",
+      "name": "EMSIAdminApplicationDetail",
+      "file": "operations/AdminApplicationDetail.graphql",
+      "sha256": "8c2992fb3b3f1387ff4d7752d902c31c50b33263730d8b61e2718a9f41af705e",
+      "body": "query EMSIAdminApplicationDetail($id: ID!) {\n\tadminApplicationDetail(id: $id) {\n\t\tid\n\t\tapplicant {\n\t\t\tid\n\t\t\tusername\n\t\t\tdisplayName\n\t\t\tcity\n\t\t\tmembershipState\n\t\t\tapplicationState\n\t\t\troleLabels\n\t\t\tvisibility {\n\t\t\t\tfield\n\t\t\t\tstate\n\t\t\t\tcanReveal\n\t\t\t\treasonRequired\n\t\t\t\tauditAction\n\t\t\t}\n\t\t}\n\t\tstate\n\t\tcity\n\t\tsubmittedAt\n\t\tupdatedAt\n\t\tnextActionOwner\n\t\tshortMotivationPreview\n\t\tanswers {\n\t\t\tkey\n\t\t\tlabel\n\t\t\tvalue\n\t\t\tvalueType\n\t\t\tgroup\n\t\t\tdisplayOrder\n\t\t\trequired\n\t\t\tsensitive\n\t\t}\n\t\tanswerGroups {\n\t\t\tgroup\n\t\t\tanswers {\n\t\t\t\tkey\n\t\t\t\tlabel\n\t\t\t\tvalue\n\t\t\t\tvalueType\n\t\t\t\tgroup\n\t\t\t\tdisplayOrder\n\t\t\t\trequired\n\t\t\t\tsensitive\n\t\t\t}\n\t\t}\n\t\tapplicantCopy\n\t\tinternalNotes {\n\t\t\tbody\n\t\t\tcreatedAt\n\t\t}\n\t\tapplicantMessages {\n\t\t\tbody\n\t\t\tcreatedAt\n\t\t}\n\t\tdecisionHistory {\n\t\t\tid\n\t\t\tactorUserID\n\t\t\tactorUsername\n\t\t\taction\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\tpreviousState\n\t\t\tnewState\n\t\t\treason\n\t\t\tcreatedAt\n\t\t}\n\t\taudit {\n\t\t\tid\n\t\t\tactorUserID\n\t\t\tactorUsername\n\t\t\taction\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\tpreviousState\n\t\t\tnewState\n\t\t\treason\n\t\t\tcreatedAt\n\t\t}\n\t\tallowedActions {\n\t\t\taction\n\t\t\tlabel\n\t\t\triskLevel\n\t\t\trequiresReason\n\t\t\trequiresUserVisibleMessage\n\t\t\tcreatesProposal\n\t\t\trequiresConfirmation\n\t\t\tdisabledReason\n\t\t}\n\t}\n}\n"
+    },
+    {
+      "id": "dedadb360988fe6429d1905780f33e5704453b75f64729eeea810d5c416ad5b6",
+      "name": "EMSIAdminApplications",
+      "file": "operations/AdminApplications.graphql",
+      "sha256": "dedadb360988fe6429d1905780f33e5704453b75f64729eeea810d5c416ad5b6",
+      "body": "query EMSIAdminApplications($state: String, $limit: Int = 100) {\n\tadminApplications(state: $state, limit: $limit) {\n\t\tlimit\n\t\titems {\n\t\t\tid\n\t\t\tapplicant {\n\t\t\t\tid\n\t\t\t\tusername\n\t\t\t\tdisplayName\n\t\t\t\tcity\n\t\t\t\tmembershipState\n\t\t\t\tapplicationState\n\t\t\t\tvisibility {\n\t\t\t\t\tfield\n\t\t\t\t\tstate\n\t\t\t\t\tcanReveal\n\t\t\t\t\treasonRequired\n\t\t\t\t\tauditAction\n\t\t\t\t}\n\t\t\t}\n\t\t\tstate\n\t\t\tcity\n\t\t\tsubmittedAt\n\t\t\tupdatedAt\n\t\t\tnextActionOwner\n\t\t\tshortMotivationPreview\n\t\t}\n\t}\n}\n"
+    },
+    {
+      "id": "dcfe19252d95459b689c67505d5f220ab35ce804287e6d00504fc274a79a791a",
+      "name": "EMSIAdminReportDetail",
+      "file": "operations/AdminReportDetail.graphql",
+      "sha256": "dcfe19252d95459b689c67505d5f220ab35ce804287e6d00504fc274a79a791a",
+      "body": "query EMSIAdminReportDetail($id: ID!) {\n\tadminReportDetail(id: $id) {\n\t\tid\n\t\tcategory\n\t\tstate\n\t\triskLevel\n\t\ttargetType\n\t\ttargetID\n\t\ttargetTitle\n\t\ttargetPreviewSummary\n\t\tcreatedAt\n\t\trelatedReportCount\n\t\treporter {\n\t\t\tfield\n\t\t\tstate\n\t\t\tcanReveal\n\t\t\treasonRequired\n\t\t\tauditAction\n\t\t}\n\t\tdetails\n\t\ttargetPreview {\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\ttitle\n\t\t\tsubtitle\n\t\t\tbodyPreview\n\t\t\tmediaPreview\n\t\t\tstate\n\t\t\tsensitivity\n\t\t\trevealState {\n\t\t\t\tfield\n\t\t\t\tstate\n\t\t\t\tcanReveal\n\t\t\t\treasonRequired\n\t\t\t\tauditAction\n\t\t\t}\n\t\t\towner {\n\t\t\t\tid\n\t\t\t\tusername\n\t\t\t\tdisplayName\n\t\t\t\tcity\n\t\t\t\tmembershipState\n\t\t\t\tapplicationState\n\t\t\t\tvisibility {\n\t\t\t\t\tfield\n\t\t\t\t\tstate\n\t\t\t\t\tcanReveal\n\t\t\t\t\treasonRequired\n\t\t\t\t\tauditAction\n\t\t\t\t}\n\t\t\t}\n\t\t}\n\t\ttargetOwner {\n\t\t\tid\n\t\t\tusername\n\t\t\tdisplayName\n\t\t\tcity\n\t\t\tmembershipState\n\t\t\tapplicationState\n\t\t\tvisibility {\n\t\t\t\tfield\n\t\t\t\tstate\n\t\t\t\tcanReveal\n\t\t\t\treasonRequired\n\t\t\t\tauditAction\n\t\t\t}\n\t\t}\n\t\treporterRevealState {\n\t\t\tfield\n\t\t\tstate\n\t\t\tcanReveal\n\t\t\treasonRequired\n\t\t\tauditAction\n\t\t}\n\t\trelatedReports {\n\t\t\tid\n\t\t\tcategory\n\t\t\tstate\n\t\t\tcreatedAt\n\t\t}\n\t\tblockHistory {\n\t\t\tactive\n\t\t\treason\n\t\t\tcreatedAt\n\t\t\tupdatedAt\n\t\t}\n\t\tmoderationHistory {\n\t\t\tid\n\t\t\tactorUserID\n\t\t\tactorUsername\n\t\t\taction\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\tpreviousState\n\t\t\tnewState\n\t\t\treason\n\t\t\tcreatedAt\n\t\t}\n\t\tsensitiveContentRevealState {\n\t\t\tfield\n\t\t\tstate\n\t\t\tcanReveal\n\t\t\treasonRequired\n\t\t\tauditAction\n\t\t}\n\t\taudit {\n\t\t\tid\n\t\t\tactorUserID\n\t\t\tactorUsername\n\t\t\taction\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\tpreviousState\n\t\t\tnewState\n\t\t\treason\n\t\t\tcreatedAt\n\t\t}\n\t\tallowedActions {\n\t\t\taction\n\t\t\tlabel\n\t\t\triskLevel\n\t\t\trequiresReason\n\t\t\trequiresUserVisibleMessage\n\t\t\tcreatesProposal\n\t\t\trequiresConfirmation\n\t\t\tdisabledReason\n\t\t}\n\t}\n}\n"
+    },
+    {
+      "id": "e314026167f42c34ae453e31ef5f086002639459f3d14bd3576940d644f5b943",
+      "name": "EMSIAdminReports",
+      "file": "operations/AdminReports.graphql",
+      "sha256": "e314026167f42c34ae453e31ef5f086002639459f3d14bd3576940d644f5b943",
+      "body": "query EMSIAdminReports($state: String, $limit: Int = 100) {\n\tadminReports(state: $state, limit: $limit) {\n\t\tlimit\n\t\titems {\n\t\t\tid\n\t\t\tcategory\n\t\t\tstate\n\t\t\triskLevel\n\t\t\ttargetType\n\t\t\ttargetID\n\t\t\ttargetTitle\n\t\t\ttargetPreviewSummary\n\t\t\tcreatedAt\n\t\t\trelatedReportCount\n\t\t\treporter {\n\t\t\t\tfield\n\t\t\t\tstate\n\t\t\t\tcanReveal\n\t\t\t\treasonRequired\n\t\t\t\tauditAction\n\t\t\t}\n\t\t}\n\t}\n}\n"
+    },
+    {
       "id": "507b7726370cad3628afe5fb71720cdb987e3f4370f8b58eb1685baf9357f291",
       "name": "EMSICities",
       "file": "operations/Cities.graphql",
@@ -22,6 +50,13 @@
       "file": "operations/HomeFeed.graphql",
       "sha256": "a2e50050ddb7819d8910565797f2cb1cee78fdc391033c16400cfdc9229e31c4",
       "body": "query EMSIHomeFeed($mode: HomeFeedMode = FOR_YOU, $cursor: String) {\n\thomeFeed(mode: $mode, cursor: $cursor) {\n\t\titems {\n\t\t\ttype\n\t\t\tid\n\t\t\treason {\n\t\t\t\tkey\n\t\t\t\targs\n\t\t\t\ttext\n\t\t\t\tsystemImage\n\t\t\t}\n\t\t\tcontrols\n\t\t\ttrackingToken\n\t\t\tpost {\n\t\t\t\tid\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\tauthor {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t\tbody\n\t\t\t\tcreatedAt\n\t\t\t\tlikeCount\n\t\t\t\treplyCount\n\t\t\t\tisLiked\n\t\t\t\tmediaURL\n\t\t\t\tmediaKind\n\t\t\t\tthumbnailURL\n\t\t\t\tblurhash\n\t\t\t\twidth\n\t\t\t\theight\n\t\t\t}\n\t\t\tevent {\n\t\t\t\tid\n\t\t\t\ttitle\n\t\t\t\tsummary\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\tcity\n\t\t\t\tvenue\n\t\t\t\tdate\n\t\t\t\tcapacity\n\t\t\t\tjoinedCount\n\t\t\t\twaitingCount\n\t\t\t\tstatus\n\t\t\t\tparticipation\n\t\t\t\ttags\n\t\t\t\thost {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t}\n\t\t\tliveRoom {\n\t\t\t\tid\n\t\t\t\tchannelID\n\t\t\t\ttitle\n\t\t\t\tsubtitle\n\t\t\t\tparticipantCount\n\t\t\t\tparticipants {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t}\n\t\t\tchannelPulse {\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\taccentName\n\t\t\t\tsummary\n\t\t\t\tnewPostCount\n\t\t\t\tpreviews {\n\t\t\t\t\tid\n\t\t\t\t\tauthorName\n\t\t\t\t\tsnippet\n\t\t\t\t}\n\t\t\t}\n\t\t\tfriendActivity {\n\t\t\t\tid\n\t\t\t\tactor {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t\ttext\n\t\t\t\tsystemImage\n\t\t\t\ttargetID\n\t\t\t}\n\t\t}\n\t\tnextCursor\n\t\trefreshCursor\n\t\tgeneratedAt\n\t}\n}\n"
+    },
+    {
+      "id": "3e8c7b8ad75ddb40d107c6ca0606665ca5b8ac12c8f36e8196e455859242c886",
+      "name": "EMSIStaffConsoleSummary",
+      "file": "operations/StaffConsoleSummary.graphql",
+      "sha256": "3e8c7b8ad75ddb40d107c6ca0606665ca5b8ac12c8f36e8196e455859242c886",
+      "body": "query EMSIStaffConsoleSummary{\n\tstaffConsoleSummary {\n\t\tapplications {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\treports {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tfeedback {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\torientation {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tstories {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tactionProposals {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tintakes {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tcityOps {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tsessions {\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t\tpermissions {\n\t\t\tpermission\n\t\t\tscope\n\t\t}\n\t\tmodules {\n\t\t\tid\n\t\t\ttitle\n\t\t\tsystemImage\n\t\t\tpermission\n\t\t\tscope\n\t\t\tpending\n\t\t\ttotal\n\t\t}\n\t}\n}\n"
     },
     {
       "id": "7ab5616db8305ce11da097524a803e950945d40bd82663055a2d65494a34a945",
