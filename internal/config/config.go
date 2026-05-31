@@ -30,6 +30,7 @@ type Config struct {
 	Operations   []string                     `yaml:"operations"`
 	Manifest     ManifestConfig               `yaml:"manifest"`
 	Environments map[string]EnvironmentConfig `yaml:"environments"`
+	Profiles     map[string]ProfileConfig     `yaml:"profiles"`
 	Tests        TestConfig                   `yaml:"tests"`
 	Reports      ReportConfig                 `yaml:"reports"`
 }
@@ -40,13 +41,59 @@ type ManifestConfig struct {
 }
 
 type EnvironmentConfig struct {
-	Endpoint string            `yaml:"endpoint"`
-	Headers  map[string]string `yaml:"headers"`
+	Endpoint    string            `yaml:"endpoint"`
+	Headers     map[string]string `yaml:"headers"`
+	RequiredEnv []string          `yaml:"requiredEnv"`
+	HealthCheck HealthCheckConfig `yaml:"healthCheck"`
+}
+
+type HealthCheckConfig struct {
+	Method         string            `yaml:"method"`
+	URL            string            `yaml:"url"`
+	Path           string            `yaml:"path"`
+	ExpectedStatus int               `yaml:"expectedStatus"`
+	Timeout        string            `yaml:"timeout"`
+	Headers        map[string]string `yaml:"headers"`
+}
+
+type ProfileConfig struct {
+	Headers   map[string]string `yaml:"headers"`
+	Variables map[string]any    `yaml:"variables"`
 }
 
 type TestConfig struct {
-	Fixtures                 string `yaml:"fixtures"`
-	RequireOperationCoverage bool   `yaml:"requireOperationCoverage"`
+	Fixtures                 string                     `yaml:"fixtures"`
+	RequireOperationCoverage bool                       `yaml:"requireOperationCoverage"`
+	Suites                   map[string]TestSuiteConfig `yaml:"suites"`
+	Coverage                 CoverageConfig             `yaml:"coverage"`
+	Snapshot                 SnapshotConfig             `yaml:"snapshot"`
+	Retry                    RetryConfig                `yaml:"retry"`
+	MaxLatencyMs             int                        `yaml:"maxLatencyMs"`
+}
+
+type TestSuiteConfig struct {
+	Tags         []string `yaml:"tags"`
+	Exclude      []string `yaml:"exclude"`
+	MaxLatencyMs int      `yaml:"maxLatencyMs"`
+}
+
+type CoverageConfig struct {
+	RequirePositiveFixture     bool     `yaml:"requirePositiveFixture"`
+	RequireTags                []string `yaml:"requireTags"`
+	ForbidUnknownOperations    bool     `yaml:"forbidUnknownOperations"`
+	ForbidDeprecatedOperations bool     `yaml:"forbidDeprecatedOperations"`
+}
+
+type SnapshotConfig struct {
+	Mode        string   `yaml:"mode"`
+	IgnorePaths []string `yaml:"ignorePaths"`
+	RedactPaths []string `yaml:"redactPaths"`
+}
+
+type RetryConfig struct {
+	MaxAttempts             int      `yaml:"maxAttempts"`
+	Backoff                 string   `yaml:"backoff"`
+	RetryableFailureClasses []string `yaml:"retryableFailureClasses"`
 }
 
 type ReportConfig struct {
@@ -95,9 +142,16 @@ environments:
     endpoint: http://localhost:8080/graphql
     headers:
       Authorization: Bearer ${GRAPHGATE_TOKEN}
+profiles:
+  local-user:
+    headers:
+      X-User-ID: ${GRAPHGATE_USER_ID}
 tests:
   fixtures: ./graphgate/fixtures/**/*.json
   requireOperationCoverage: false
+  suites:
+    smoke:
+      tags: [smoke]
 reports:
   output: ./graphgate/reports
 `)

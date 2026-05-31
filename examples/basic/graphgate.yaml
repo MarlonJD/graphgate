@@ -9,7 +9,14 @@ environments:
     endpoint: http://localhost:8080/graphql
     headers:
       Authorization: Bearer ${GRAPHGATE_TOKEN}
+profiles:
+  local-user:
+    headers:
+      X-User-ID: ${GRAPHGATE_USER_ID}
 tests:
   fixtures: ./graphgate/fixtures/**/*.json
+  suites:
+    smoke:
+      tags: [smoke]
 reports:
   output: ./graphgate/reports

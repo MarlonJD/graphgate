@@ -15,6 +15,7 @@ import (
 	"github.com/vektah/gqlparser/v2/gqlerror"
 	"github.com/vektah/gqlparser/v2/parser"
 	"github.com/vektah/gqlparser/v2/validator"
+	validatorcore "github.com/vektah/gqlparser/v2/validator/core"
 )
 
 func ValidateProject(cfg *config.Config) (ValidationResult, error) {
@@ -112,15 +113,50 @@ func validateOperationFile(cfg *config.Config, schema *ast.Schema, file string, 
 		normalized := normalizeOperation(op, doc.Fragments)
 		id := operationID(normalized)
 		operations = append(operations, Operation{
-			Name:       op.Name,
-			ID:         id,
-			SHA256:     id,
-			File:       relFile,
-			Normalized: normalized,
+			Name:             op.Name,
+			ID:               id,
+			SHA256:           id,
+			File:             relFile,
+			DeprecatedFields: deprecatedFields(schema, doc, op.Name),
+			Normalized:       normalized,
 		})
 	}
 
 	return operations, issues
+}
+
+func deprecatedFields(schema *ast.Schema, doc *ast.QueryDocument, operationName string) []string {
+	seen := map[string]struct{}{}
+	var fields []string
+	observers := &validatorcore.Events{}
+	observers.OnField(func(_ *validatorcore.Walker, field *ast.Field) {
+		if field.Definition == nil || field.Definition.Directives.ForName("deprecated") == nil {
+			return
+		}
+		typeName := ""
+		if field.ObjectDefinition != nil {
+			typeName = field.ObjectDefinition.Name
+		}
+		name := field.Name
+		if typeName != "" {
+			name = typeName + "." + field.Name
+		}
+		if _, ok := seen[name]; ok {
+			return
+		}
+		seen[name] = struct{}{}
+		fields = append(fields, name)
+	})
+	operation := doc.Operations.ForName(operationName)
+	if operation == nil {
+		return nil
+	}
+	validatorcore.Walk(schema, &ast.QueryDocument{
+		Operations: ast.OperationList{operation},
+		Fragments:  doc.Fragments,
+	}, observers)
+	sort.Strings(fields)
+	return fields
 }
 
 func normalizeOperation(op *ast.OperationDefinition, fragments ast.FragmentDefinitionList) string {

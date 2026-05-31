@@ -1,6 +1,11 @@
 {
   "name": "viewer smoke",
   "operation": "GetViewer",
+  "tags": [
+    "smoke",
+    "positive"
+  ],
+  "profile": "local-user",
   "variables": {},
   "expectedStatus": 200,
   "expectedErrorCodes": [],

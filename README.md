@@ -61,7 +61,8 @@ graphgate validate
 graphgate manifest
 graphgate manifest --check
 graphgate diff --base schema.base.graphql
-graphgate test --env local
+graphgate test --env local --tag smoke
+graphgate smoke --env local --suite local-readiness
 graphgate report --format markdown
 graphgate ui
 ```
@@ -82,6 +83,8 @@ graphgate manifest
 graphgate manifest --check
 graphgate diff --base schema.base.graphql
 graphgate test --env local
+graphgate test --env local --tag smoke --exclude destructive
+graphgate smoke --env local --suite local-readiness --evidence graphgate/reports/local-readiness.json
 graphgate report --format markdown
 graphgate report --format json
 graphgate ui
@@ -112,10 +115,39 @@ manifest:
 environments:
   local:
     endpoint: http://localhost:8080/graphql
+    requiredEnv:
+      - GRAPHGATE_TOKEN
+    healthCheck:
+      path: /health
+      expectedStatus: 200
     headers:
       Authorization: Bearer ${GRAPHGATE_TOKEN}
+profiles:
+  local-user:
+    headers:
+      X-User-ID: ${GRAPHGATE_USER_ID}
+    variables:
+      viewerID: ${GRAPHGATE_USER_ID}
 tests:
   fixtures: ./graphgate/fixtures/**/*.json
+  suites:
+    local-readiness:
+      tags: [smoke]
+      exclude: [destructive]
+      maxLatencyMs: 2000
+  coverage:
+    requirePositiveFixture: true
+    requireTags: [smoke]
+    forbidUnknownOperations: true
+    forbidDeprecatedOperations: true
+  snapshot:
+    mode: shape
+    ignorePaths: [data.viewer.generatedAt]
+    redactPaths: [data.viewer.email]
+  retry:
+    maxAttempts: 2
+    backoff: 250ms
+    retryableFailureClasses: [network_error, timeout]
 reports:
   output: ./graphgate/reports
 ```
@@ -142,13 +174,16 @@ markdown reports.
 graphgate test --env local
 graphgate test --env staging --format json
 graphgate test --env local --update
-graphgate smoke --env local
+graphgate test --env local --tag smoke --exclude destructive
+graphgate smoke --env local --suite local-readiness --evidence graphgate/reports/local-readiness.json
 ```
 
 Fixtures support runtime operation names, persisted-only requests, per-fixture
-headers, env-expanded variables, expected HTTP status, expected GraphQL error
-codes, JSON shape assertions, minimum array lengths, strict operation coverage,
-and snapshots. See
+tags, named suites, reusable profiles, per-fixture headers, env-expanded
+variables, expected HTTP status, expected GraphQL error codes, JSON shape and
+array assertions, strict operation coverage gates, negative/security fixture
+conventions, latency thresholds, retry classification, readiness checks,
+evidence bundles, and snapshots. See
 [docs/CONTRACT_TESTS.md](docs/CONTRACT_TESTS.md).
 
 ## Local Web UI

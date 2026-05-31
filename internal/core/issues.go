@@ -19,11 +19,12 @@ type Issue struct {
 }
 
 type Operation struct {
-	Name       string `json:"name"`
-	ID         string `json:"id"`
-	SHA256     string `json:"sha256"`
-	File       string `json:"file"`
-	Normalized string `json:"-"`
+	Name             string   `json:"name"`
+	ID               string   `json:"id"`
+	SHA256           string   `json:"sha256"`
+	File             string   `json:"file"`
+	DeprecatedFields []string `json:"deprecatedFields,omitempty"`
+	Normalized       string   `json:"-"`
 }
 
 type ValidationResult struct {

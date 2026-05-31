@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io"
@@ -25,6 +26,7 @@ const (
 	exitManifestMismatch = 5
 	exitBreakingChange   = 6
 	exitTestFailure      = 7
+	graphGateVersion     = "dev"
 )
 
 func main() {
@@ -52,9 +54,9 @@ func run(args []string, stdout io.Writer, stderr io.Writer) int {
 	case "diff":
 		return runDiff(args[2:], stdout, stderr)
 	case "test":
-		return runTest(args[2:], stdout, stderr)
+		return runTest("test", args[2:], stdout, stderr)
 	case "smoke":
-		return runTest(args[2:], stdout, stderr)
+		return runTest("smoke", args[2:], stdout, stderr)
 	case "ui":
 		return runUI(args[2:], stdout, stderr)
 	default:
@@ -101,14 +103,22 @@ func runDiff(args []string, stdout io.Writer, stderr io.Writer) int {
 	return exitOK
 }
 
-func runTest(args []string, stdout io.Writer, stderr io.Writer) int {
-	fs := newFlagSet("test", stderr)
+func runTest(command string, args []string, stdout io.Writer, stderr io.Writer) int {
+	fs := newFlagSet(command, stderr)
 	configPath := fs.String("config", config.DefaultConfigPath, "path to graphgate.yaml")
 	env := fs.String("env", "local", "environment name from graphgate.yaml")
 	update := fs.Bool("update", false, "update fixture snapshots with latest responses")
 	format := fs.String("format", "markdown", "report format: markdown or json")
 	output := fs.String("output", "", "optional report output path")
 	timeout := fs.Duration("timeout", 10*time.Second, "HTTP timeout per fixture")
+	suite := fs.String("suite", "", "named fixture suite from graphgate.yaml")
+	skipReadiness := fs.Bool("skip-readiness", false, "skip required environment and endpoint readiness checks")
+	evidence := fs.String("evidence", "", "optional evidence bundle output path")
+	evidenceFormat := fs.String("evidence-format", "json", "evidence format: json, markdown, or both")
+	var tags stringListFlag
+	var excludeTags stringListFlag
+	fs.Var(&tags, "tag", "fixture tag to include; repeat for AND selection")
+	fs.Var(&excludeTags, "exclude", "fixture tag to exclude; repeat to exclude any matching fixture")
 	if err := fs.Parse(args); err != nil {
 		return exitInvalidConfig
 	}
@@ -118,11 +128,21 @@ func runTest(args []string, stdout io.Writer, stderr io.Writer) int {
 		return exitInvalidConfig
 	}
 	result, err := core.RunContractTests(context.Background(), cfg, core.TestOptions{
-		Environment: *env,
-		Update:      *update,
-		Timeout:     *timeout,
+		Environment:      *env,
+		Update:           *update,
+		Timeout:          *timeout,
+		Tags:             tags,
+		Exclude:          excludeTags,
+		Suite:            *suite,
+		SkipReadiness:    *skipReadiness,
+		Command:          append([]string{"graphgate", command}, args...),
+		GraphGateVersion: graphGateVersion,
 	})
 	if err != nil {
+		if errors.Is(err, core.ErrUnknownSuite) || errors.Is(err, core.ErrNoSelectedFixtures) {
+			fmt.Fprintf(stderr, "test failed: %v\n", err)
+			return exitInvalidConfig
+		}
 		fmt.Fprintf(stderr, "test failed: %v\n", err)
 		return exitInternalError
 	}
@@ -133,6 +153,13 @@ func runTest(args []string, stdout io.Writer, stderr io.Writer) int {
 	}
 	if code := writeReportData(cfg, *output, data, stdout, stderr); code != exitOK {
 		return code
+	}
+	if strings.TrimSpace(*evidence) != "" {
+		if err := writeEvidence(cfg, *evidence, *evidenceFormat, result); err != nil {
+			fmt.Fprintf(stderr, "evidence write failed: %v\n", err)
+			return exitInternalError
+		}
+		fmt.Fprintf(stdout, "Wrote evidence: %s\n", cfg.RelativePath(cfg.ResolvePath(*evidence)))
 	}
 	if !result.OK {
 		return exitTestFailure
@@ -347,6 +374,35 @@ func renderTestReport(format string, result core.TestRunResult) ([]byte, error) 
 	}
 }
 
+func writeEvidence(cfg *config.Config, output string, format string, result core.TestRunResult) error {
+	outputPath := cfg.ResolvePath(output)
+	if err := os.MkdirAll(filepath.Dir(outputPath), 0o755); err != nil {
+		return err
+	}
+	switch strings.ToLower(strings.TrimSpace(format)) {
+	case "", "json":
+		data, err := report.RenderTestJSON(result)
+		if err != nil {
+			return err
+		}
+		return os.WriteFile(outputPath, data, 0o644)
+	case "markdown", "md":
+		return os.WriteFile(outputPath, report.RenderTestMarkdown(result), 0o644)
+	case "both":
+		data, err := report.RenderTestJSON(result)
+		if err != nil {
+			return err
+		}
+		if err := os.WriteFile(outputPath, data, 0o644); err != nil {
+			return err
+		}
+		markdownPath := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + ".md"
+		return os.WriteFile(markdownPath, report.RenderTestMarkdown(result), 0o644)
+	default:
+		return fmt.Errorf("unsupported evidence format %q", format)
+	}
+}
+
 func writeReportData(cfg *config.Config, output string, data []byte, stdout io.Writer, stderr io.Writer) int {
 	if strings.TrimSpace(output) == "" {
 		_, _ = stdout.Write(data)
@@ -379,8 +435,8 @@ func printUsage(w io.Writer) {
 	fmt.Fprintln(w, "  graphgate validate [--config graphgate.yaml]")
 	fmt.Fprintln(w, "  graphgate manifest [--config graphgate.yaml] [--check]")
 	fmt.Fprintln(w, "  graphgate diff --base old-schema.graphql [--config graphgate.yaml] [--format markdown|json]")
-	fmt.Fprintln(w, "  graphgate test [--config graphgate.yaml] [--env local] [--update]")
-	fmt.Fprintln(w, "  graphgate smoke [--config graphgate.yaml] [--env local]")
+	fmt.Fprintln(w, "  graphgate test [--config graphgate.yaml] [--env local] [--suite name] [--tag tag] [--exclude tag] [--update]")
+	fmt.Fprintln(w, "  graphgate smoke [--config graphgate.yaml] [--env local] [--suite name] [--tag tag] [--exclude tag]")
 	fmt.Fprintln(w, "  graphgate report [--config graphgate.yaml] [--format markdown|json] [--output path]")
 	fmt.Fprintln(w, "  graphgate ui [--config graphgate.yaml] [--addr 127.0.0.1:4317]")
 	fmt.Fprintln(w)
@@ -391,6 +447,20 @@ func printUsage(w io.Writer) {
 	fmt.Fprintf(w, "  %d manifest mismatch\n", exitManifestMismatch)
 	fmt.Fprintf(w, "  %d breaking schema change\n", exitBreakingChange)
 	fmt.Fprintf(w, "  %d contract test failure\n", exitTestFailure)
+}
+
+type stringListFlag []string
+
+func (f *stringListFlag) String() string {
+	return strings.Join(*f, ",")
+}
+
+func (f *stringListFlag) Set(value string) error {
+	value = strings.TrimSpace(value)
+	if value != "" {
+		*f = append(*f, value)
+	}
+	return nil
 }
 
 func printIssues(w io.Writer, issues []core.Issue) {
