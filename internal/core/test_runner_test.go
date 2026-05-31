@@ -324,6 +324,70 @@ func TestRunContractTestsRetriesConfiguredFailureClasses(t *testing.T) {
 	}
 }
 
+func TestRunContractTestsSnapshotExactSupportsIgnoreAndRedactPaths(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"data":{"viewer":{"id":"u1","email":"new@example.com","generatedAt":"2026-05-31T12:00:00Z"}}}`))
+	}))
+	defer server.Close()
+
+	dir := t.TempDir()
+	writeProjectFile(t, dir, "schema.graphql", "type Query { viewer: User! }\ntype User { id: ID!, email: String, generatedAt: String }\n")
+	writeProjectFile(t, dir, "operations/GetViewer.graphql", "query GetViewer { viewer { id email generatedAt } }\n")
+	writeProjectFile(t, dir, "graphgate/fixtures/get_viewer.json", `{
+  "operation": "GetViewer",
+  "snapshot": {
+    "data": {
+      "viewer": {
+        "id": "u1",
+        "email": "old@example.com",
+        "generatedAt": "2026-05-30T12:00:00Z"
+      }
+    }
+  }
+}`)
+	cfgData := "schema: ./schema.graphql\noperations:\n  - ./operations/**/*.graphql\nmanifest:\n  format: graphgate\n  output: ./graphgate.manifest.json\nenvironments:\n  local:\n    endpoint: " + server.URL + "\ntests:\n  fixtures: ./graphgate/fixtures/**/*.json\n  snapshot:\n    mode: exact\n    ignorePaths: [data.viewer.generatedAt]\n    redactPaths: [data.viewer.email]\n"
+	cfgPath := filepath.Join(dir, config.DefaultConfigPath)
+	if err := os.WriteFile(cfgPath, []byte(cfgData), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		t.Fatalf("config.Load() error = %v", err)
+	}
+
+	result, err := RunContractTests(context.Background(), cfg, TestOptions{Environment: "local", Timeout: time.Second})
+	if err != nil {
+		t.Fatalf("RunContractTests() error = %v", err)
+	}
+	if !result.OK {
+		t.Fatalf("result = %#v", result)
+	}
+}
+
+func TestRunContractTestsForbidsDeprecatedOperations(t *testing.T) {
+	dir := t.TempDir()
+	writeProjectFile(t, dir, "schema.graphql", "type Query { viewer: User! }\ntype User { id: ID!, oldName: String @deprecated(reason: \"Use name\") }\n")
+	writeProjectFile(t, dir, "operations/GetViewer.graphql", "query GetViewer { viewer { id oldName } }\n")
+	writeProjectFile(t, dir, "graphgate/fixtures/get_viewer.json", `{"operation":"GetViewer"}`)
+	cfgData := "schema: ./schema.graphql\noperations:\n  - ./operations/**/*.graphql\nmanifest:\n  format: graphgate\n  output: ./graphgate.manifest.json\nenvironments:\n  local:\n    endpoint: http://127.0.0.1:1/graphql\ntests:\n  fixtures: ./graphgate/fixtures/**/*.json\n  coverage:\n    forbidDeprecatedOperations: true\n"
+	cfgPath := filepath.Join(dir, config.DefaultConfigPath)
+	if err := os.WriteFile(cfgPath, []byte(cfgData), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		t.Fatalf("config.Load() error = %v", err)
+	}
+
+	result, err := RunContractTests(context.Background(), cfg, TestOptions{Environment: "local", Timeout: time.Second})
+	if err != nil {
+		t.Fatalf("RunContractTests() error = %v", err)
+	}
+	if result.OK || result.FailureClass != FailureClassCoverage || !strings.Contains(strings.Join(result.Failures, ","), "User.oldName") {
+		t.Fatalf("result = %#v", result)
+	}
+}
+
 func TestRunContractTestsAllowsExplicitNegativeSelectionWithPositiveCoverageGate(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		_, _ = w.Write([]byte(`{"errors":[{"message":"forbidden","extensions":{"code":"FORBIDDEN"}}]}`))
