@@ -45,7 +45,8 @@ type EnvironmentConfig struct {
 }
 
 type TestConfig struct {
-	Fixtures string `yaml:"fixtures"`
+	Fixtures                 string `yaml:"fixtures"`
+	RequireOperationCoverage bool   `yaml:"requireOperationCoverage"`
 }
 
 type ReportConfig struct {
@@ -96,6 +97,7 @@ environments:
       Authorization: Bearer ${GRAPHGATE_TOKEN}
 tests:
   fixtures: ./graphgate/fixtures/**/*.json
+  requireOperationCoverage: false
 reports:
   output: ./graphgate/reports
 `)

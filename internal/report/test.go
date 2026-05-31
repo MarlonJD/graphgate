@@ -33,14 +33,18 @@ func RenderTestMarkdown(result core.TestRunResult) []byte {
 		fmt.Fprintf(&buf, "No fixture results.\n")
 		return buf.Bytes()
 	}
-	fmt.Fprintf(&buf, "| Fixture | Operation | Status | Result | Failures |\n")
-	fmt.Fprintf(&buf, "| --- | --- | --- | --- | --- |\n")
+	fmt.Fprintf(&buf, "| Fixture | Operation | Request operation | Status | Result | Failures |\n")
+	fmt.Fprintf(&buf, "| --- | --- | --- | --- | --- | --- |\n")
 	for _, item := range result.Results {
 		rowStatus := "PASS"
 		if !item.Passed {
 			rowStatus = "FAIL"
 		}
-		fmt.Fprintf(&buf, "| `%s` | `%s` | `%d` | **%s** | %s |\n", escapeTable(item.File), escapeTable(item.Operation), item.Status, rowStatus, escapeTable(joinFailures(item.Failures)))
+		requestOperation := item.RequestOperationName
+		if requestOperation == "" {
+			requestOperation = item.Operation
+		}
+		fmt.Fprintf(&buf, "| `%s` | `%s` | `%s` | `%d` | **%s** | %s |\n", escapeTable(item.File), escapeTable(item.Operation), escapeTable(requestOperation), item.Status, rowStatus, escapeTable(joinFailures(item.Failures)))
 	}
 	return buf.Bytes()
 }

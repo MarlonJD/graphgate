@@ -142,10 +142,13 @@ markdown reports.
 graphgate test --env local
 graphgate test --env staging --format json
 graphgate test --env local --update
+graphgate smoke --env local
 ```
 
-Fixtures support variables, expected HTTP status, expected GraphQL error codes,
-JSON shape assertions, and snapshots. See
+Fixtures support runtime operation names, persisted-only requests, per-fixture
+headers, env-expanded variables, expected HTTP status, expected GraphQL error
+codes, JSON shape assertions, minimum array lengths, strict operation coverage,
+and snapshots. See
 [docs/CONTRACT_TESTS.md](docs/CONTRACT_TESTS.md).
 
 ## Local Web UI

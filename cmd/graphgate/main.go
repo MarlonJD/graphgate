@@ -53,6 +53,8 @@ func run(args []string, stdout io.Writer, stderr io.Writer) int {
 		return runDiff(args[2:], stdout, stderr)
 	case "test":
 		return runTest(args[2:], stdout, stderr)
+	case "smoke":
+		return runTest(args[2:], stdout, stderr)
 	case "ui":
 		return runUI(args[2:], stdout, stderr)
 	default:
@@ -378,6 +380,7 @@ func printUsage(w io.Writer) {
 	fmt.Fprintln(w, "  graphgate manifest [--config graphgate.yaml] [--check]")
 	fmt.Fprintln(w, "  graphgate diff --base old-schema.graphql [--config graphgate.yaml] [--format markdown|json]")
 	fmt.Fprintln(w, "  graphgate test [--config graphgate.yaml] [--env local] [--update]")
+	fmt.Fprintln(w, "  graphgate smoke [--config graphgate.yaml] [--env local]")
 	fmt.Fprintln(w, "  graphgate report [--config graphgate.yaml] [--format markdown|json] [--output path]")
 	fmt.Fprintln(w, "  graphgate ui [--config graphgate.yaml] [--addr 127.0.0.1:4317]")
 	fmt.Fprintln(w)

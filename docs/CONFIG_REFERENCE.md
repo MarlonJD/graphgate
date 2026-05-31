@@ -18,6 +18,7 @@ environments:
       Authorization: Bearer ${GRAPHGATE_TOKEN}
 tests:
   fixtures: ./graphgate/fixtures/**/*.json
+  requireOperationCoverage: false
 reports:
   output: ./graphgate/reports
 ```
@@ -45,10 +46,19 @@ Path where `graphgate manifest` writes the deterministic persisted-operation man
 Named GraphQL endpoints used by `graphgate test`.
 
 Headers may reference environment variables, for example `${GRAPHGATE_TOKEN}`.
+Fixture-level headers are merged after environment headers, which lets a smoke
+suite switch between safe local users without duplicating environments.
 
 ### `tests.fixtures`
 
-Glob pattern for fixture-based contract tests used by `graphgate test`.
+Glob pattern for fixture-based contract tests used by `graphgate test` and
+`graphgate smoke`.
+
+### `tests.requireOperationCoverage`
+
+Optional boolean. When true, `graphgate test` and `graphgate smoke` fail before
+running requests unless the fixture set references every validated operation at
+least once. This is useful for strict endpoint smoke gates.
 
 ### `reports.output`
 

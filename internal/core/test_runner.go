@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -23,21 +24,25 @@ type TestOptions struct {
 }
 
 type Fixture struct {
-	Name               string          `json:"name,omitempty"`
-	Operation          string          `json:"operation,omitempty"`
-	OperationName      string          `json:"operationName,omitempty"`
-	Variables          map[string]any  `json:"variables,omitempty"`
-	ExpectedStatus     int             `json:"expectedStatus,omitempty"`
-	ExpectedErrorCodes []string        `json:"expectedErrorCodes,omitempty"`
-	Assertions         []JSONAssertion `json:"assertions,omitempty"`
-	Snapshot           any             `json:"snapshot,omitempty"`
+	Name                 string            `json:"name,omitempty"`
+	Operation            string            `json:"operation,omitempty"`
+	OperationName        string            `json:"operationName,omitempty"`
+	RequestOperationName string            `json:"requestOperationName,omitempty"`
+	IncludeQuery         *bool             `json:"includeQuery,omitempty"`
+	Headers              map[string]string `json:"headers,omitempty"`
+	Variables            map[string]any    `json:"variables,omitempty"`
+	ExpectedStatus       int               `json:"expectedStatus,omitempty"`
+	ExpectedErrorCodes   []string          `json:"expectedErrorCodes,omitempty"`
+	Assertions           []JSONAssertion   `json:"assertions,omitempty"`
+	Snapshot             any               `json:"snapshot,omitempty"`
 }
 
 type JSONAssertion struct {
-	Path   string `json:"path"`
-	Exists *bool  `json:"exists,omitempty"`
-	Type   string `json:"type,omitempty"`
-	Equals any    `json:"equals,omitempty"`
+	Path     string `json:"path"`
+	Exists   *bool  `json:"exists,omitempty"`
+	Type     string `json:"type,omitempty"`
+	Equals   any    `json:"equals,omitempty"`
+	MinItems *int   `json:"minItems,omitempty"`
 }
 
 type TestRunResult struct {
@@ -50,14 +55,15 @@ type TestRunResult struct {
 }
 
 type FixtureRunResult struct {
-	Name           string   `json:"name"`
-	File           string   `json:"file"`
-	Operation      string   `json:"operation"`
-	Status         int      `json:"status"`
-	Passed         bool     `json:"passed"`
-	Failures       []string `json:"failures"`
-	ErrorCodes     []string `json:"errorCodes,omitempty"`
-	SnapshotUpdate bool     `json:"snapshotUpdate,omitempty"`
+	Name                 string   `json:"name"`
+	File                 string   `json:"file"`
+	Operation            string   `json:"operation"`
+	RequestOperationName string   `json:"requestOperationName,omitempty"`
+	Status               int      `json:"status"`
+	Passed               bool     `json:"passed"`
+	Failures             []string `json:"failures"`
+	ErrorCodes           []string `json:"errorCodes,omitempty"`
+	SnapshotUpdate       bool     `json:"snapshotUpdate,omitempty"`
 }
 
 func RunContractTests(ctx context.Context, cfg *config.Config, options TestOptions) (TestRunResult, error) {
@@ -91,6 +97,11 @@ func RunContractTests(ctx context.Context, cfg *config.Config, options TestOptio
 	if err != nil {
 		return TestRunResult{}, err
 	}
+	if cfg.Tests.RequireOperationCoverage {
+		if err := ensureFixtureOperationCoverage(cfg, files, operations); err != nil {
+			return TestRunResult{}, err
+		}
+	}
 
 	result := TestRunResult{
 		OK:          true,
@@ -116,34 +127,31 @@ func RunContractTests(ctx context.Context, cfg *config.Config, options TestOptio
 }
 
 func runFixture(ctx context.Context, cfg *config.Config, client *http.Client, env config.EnvironmentConfig, operations map[string]Operation, file string, update bool) (FixtureRunResult, error) {
-	data, err := os.ReadFile(file)
+	fixture, err := readFixture(cfg, file)
 	if err != nil {
 		return FixtureRunResult{}, err
 	}
-	var fixture Fixture
-	if err := json.Unmarshal(data, &fixture); err != nil {
-		return FixtureRunResult{}, fmt.Errorf("parse fixture %s: %w", cfg.RelativePath(file), err)
-	}
 
-	operationName := fixture.OperationName
-	if operationName == "" {
-		operationName = fixture.Operation
-	}
+	operationName := fixtureOperationName(fixture)
 	run := FixtureRunResult{
-		Name:      fixtureName(file, fixture),
-		File:      cfg.RelativePath(file),
-		Operation: operationName,
+		Name:                 fixtureName(file, fixture),
+		File:                 cfg.RelativePath(file),
+		Operation:            operationName,
+		RequestOperationName: fixture.RequestOperationName,
 	}
 	operation, ok := operations[operationName]
 	if !ok {
 		run.Failures = append(run.Failures, fmt.Sprintf("operation %q not found", operationName))
 		return finishFixtureRun(run), nil
 	}
+	run.RequestOperationName = requestOperationName(fixture, operation)
 
 	payload := map[string]any{
-		"query":         operation.Normalized,
-		"operationName": operation.Name,
-		"variables":     fixture.Variables,
+		"operationName": requestOperationName(fixture, operation),
+		"variables":     expandValue(fixture.Variables),
+	}
+	if includeQuery(fixture) {
+		payload["query"] = operation.Normalized
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
@@ -155,6 +163,9 @@ func runFixture(ctx context.Context, cfg *config.Config, client *http.Client, en
 	}
 	req.Header.Set("Content-Type", "application/json")
 	for name, value := range env.Headers {
+		req.Header.Set(name, os.ExpandEnv(value))
+	}
+	for name, value := range fixture.Headers {
 		req.Header.Set(name, os.ExpandEnv(value))
 	}
 
@@ -211,9 +222,54 @@ func runFixture(ctx context.Context, cfg *config.Config, client *http.Client, en
 	return finishFixtureRun(run), nil
 }
 
+func readFixture(cfg *config.Config, file string) (Fixture, error) {
+	data, err := os.ReadFile(file)
+	if err != nil {
+		return Fixture{}, err
+	}
+	var fixture Fixture
+	if err := json.Unmarshal(data, &fixture); err != nil {
+		return Fixture{}, fmt.Errorf("parse fixture %s: %w", cfg.RelativePath(file), err)
+	}
+	return fixture, nil
+}
+
 func finishFixtureRun(run FixtureRunResult) FixtureRunResult {
 	run.Passed = len(run.Failures) == 0
 	return run
+}
+
+func ensureFixtureOperationCoverage(cfg *config.Config, files []string, operations map[string]Operation) error {
+	covered := map[string]struct{}{}
+	for _, file := range files {
+		fixture, err := readFixture(cfg, file)
+		if err != nil {
+			return err
+		}
+		operationName := fixtureOperationName(fixture)
+		if operationName != "" {
+			covered[operationName] = struct{}{}
+		}
+	}
+
+	var missing []string
+	for name := range operations {
+		if _, ok := covered[name]; !ok {
+			missing = append(missing, name)
+		}
+	}
+	sort.Strings(missing)
+	if len(missing) > 0 {
+		return fmt.Errorf("fixtures do not cover operations: %s", strings.Join(missing, ", "))
+	}
+	return nil
+}
+
+func fixtureOperationName(fixture Fixture) string {
+	if fixture.OperationName != "" {
+		return fixture.OperationName
+	}
+	return fixture.Operation
 }
 
 func fixtureName(file string, fixture Fixture) string {
@@ -222,6 +278,17 @@ func fixtureName(file string, fixture Fixture) string {
 	}
 	base := filepath.Base(file)
 	return strings.TrimSuffix(base, filepath.Ext(base))
+}
+
+func requestOperationName(fixture Fixture, operation Operation) string {
+	if fixture.RequestOperationName != "" {
+		return fixture.RequestOperationName
+	}
+	return operation.Name
+}
+
+func includeQuery(fixture Fixture) bool {
+	return fixture.IncludeQuery == nil || *fixture.IncludeQuery
 }
 
 func graphqlErrorCodes(decoded any) []string {
@@ -280,7 +347,37 @@ func evaluateAssertion(decoded any, assertion JSONAssertion) string {
 	if assertion.Equals != nil && !reflect.DeepEqual(value, assertion.Equals) {
 		return fmt.Sprintf("%s = %v, want %v", assertion.Path, value, assertion.Equals)
 	}
+	if assertion.MinItems != nil {
+		items, ok := value.([]any)
+		if !ok {
+			return fmt.Sprintf("%s type = %s, want array for minItems", assertion.Path, valueType(value))
+		}
+		if len(items) < *assertion.MinItems {
+			return fmt.Sprintf("%s items = %d, want at least %d", assertion.Path, len(items), *assertion.MinItems)
+		}
+	}
 	return ""
+}
+
+func expandValue(value any) any {
+	switch typed := value.(type) {
+	case string:
+		return os.ExpandEnv(typed)
+	case []any:
+		out := make([]any, len(typed))
+		for i, item := range typed {
+			out[i] = expandValue(item)
+		}
+		return out
+	case map[string]any:
+		out := make(map[string]any, len(typed))
+		for key, item := range typed {
+			out[key] = expandValue(item)
+		}
+		return out
+	default:
+		return value
+	}
 }
 
 func valueAtPath(decoded any, path string) (any, bool) {
