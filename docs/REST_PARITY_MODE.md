@@ -44,15 +44,11 @@ Each mapping links one REST JSON path to one GraphQL JSON path:
 5. Compare mapped values and save a diff report.
 6. Add the GraphQL operation to GraphGate validation and manifest checks.
 
-## EMSI Example
+## Application-Owned Examples
 
-Example files are included under:
-
-```text
-examples/emsi/rest-parity/
-```
-
-These files document the target shape for a future automated parity diff runner:
+Application-specific parity fixtures should live in the application repository
+that owns the API contract. A fixture set documents the target shape for a
+future automated parity diff runner:
 
 - `rest-response.example.json`
 - `graphql-response.example.json`

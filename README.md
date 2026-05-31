@@ -157,13 +157,6 @@ graphgate ui
 The browser UI defaults to `http://localhost:4317`, reads the same config as the
 CLI, and never requires cloud login. See [docs/UI.md](docs/UI.md).
 
-## EMSI Dogfood
-
-GraphGate can be cloned beside EMSI at `tools/graphgate/` without vendoring it
-into the EMSI repository. The EMSI dogfood example validates
-`emsi_go_api/internal/graph/schema.graphqls` with sample operations. See
-[docs/EMSI_DOGFOOD.md](docs/EMSI_DOGFOOD.md).
-
 ## Distribution
 
 Install targets include GitHub Releases, Homebrew, Docker, GitHub Actions, and a

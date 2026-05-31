@@ -381,4 +381,3 @@ GraphGate uses stable exit codes for CI:
 - [DISTRIBUTION.md](DISTRIBUTION.md)
 - [UI.md](UI.md)
 - [REST_PARITY_MODE.md](REST_PARITY_MODE.md)
-- [EMSI_DOGFOOD.md](EMSI_DOGFOOD.md)

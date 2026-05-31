@@ -1,9 +1,0 @@
-query EMSIActiveEmojis {
-  activeEmojis {
-    id
-    key
-    unified
-    textFallback
-    imageURL
-  }
-}

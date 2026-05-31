@@ -59,11 +59,11 @@ Status: complete.
 - Composite GitHub Action is included.
 - macOS, Linux, Windows, Docker, and GitHub Action install docs are included.
 
-## M6: EMSI Dogfood And REST Migration Mode
+## M6: External Dogfood And REST Migration Mode
 
 Status: complete.
 
-- EMSI dogfood setup stays external and can live at `tools/graphgate/`.
-- Example config validates `emsi_go_api/internal/graph/schema.graphqls`.
-- Sample EMSI operations cover `cities`, `activeEmojis`, and `viewer`.
+- Application-specific dogfood setup stays outside this library repository.
+- Config files can target schemas and operations from adjacent application
+  repositories.
 - REST-to-GraphQL parity diff workflow is documented with mapping and response examples.

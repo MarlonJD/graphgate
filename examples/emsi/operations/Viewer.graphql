@@ -1,8 +1,0 @@
-query EMSIViewer {
-  viewer {
-    id
-    username
-    fullName
-    role
-  }
-}

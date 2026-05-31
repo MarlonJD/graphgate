@@ -1,9 +1,0 @@
-query EMSIUserSearch($searchText: String!) {
-  userSearch(searchText: $searchText) {
-    id
-    username
-    fullName
-    city
-    pictureURL
-  }
-}

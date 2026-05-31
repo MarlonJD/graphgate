@@ -1,9 +1,0 @@
-query EMSIUserProfile($userID: ID!) {
-  userProfile(userID: $userID) {
-    id
-    username
-    fullName
-    city
-    pictureURL
-  }
-}

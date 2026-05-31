@@ -1,6 +1,0 @@
-query EMSICities {
-  cities {
-    id
-    name
-  }
-}
