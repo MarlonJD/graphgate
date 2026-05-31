@@ -17,6 +17,13 @@
       "body": "query EMSICities{\n\tcities {\n\t\tid\n\t\tname\n\t}\n}\n"
     },
     {
+      "id": "a2e50050ddb7819d8910565797f2cb1cee78fdc391033c16400cfdc9229e31c4",
+      "name": "EMSIHomeFeed",
+      "file": "operations/HomeFeed.graphql",
+      "sha256": "a2e50050ddb7819d8910565797f2cb1cee78fdc391033c16400cfdc9229e31c4",
+      "body": "query EMSIHomeFeed($mode: HomeFeedMode = FOR_YOU, $cursor: String) {\n\thomeFeed(mode: $mode, cursor: $cursor) {\n\t\titems {\n\t\t\ttype\n\t\t\tid\n\t\t\treason {\n\t\t\t\tkey\n\t\t\t\targs\n\t\t\t\ttext\n\t\t\t\tsystemImage\n\t\t\t}\n\t\t\tcontrols\n\t\t\ttrackingToken\n\t\t\tpost {\n\t\t\t\tid\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\tauthor {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t\tbody\n\t\t\t\tcreatedAt\n\t\t\t\tlikeCount\n\t\t\t\treplyCount\n\t\t\t\tisLiked\n\t\t\t\tmediaURL\n\t\t\t\tmediaKind\n\t\t\t\tthumbnailURL\n\t\t\t\tblurhash\n\t\t\t\twidth\n\t\t\t\theight\n\t\t\t}\n\t\t\tevent {\n\t\t\t\tid\n\t\t\t\ttitle\n\t\t\t\tsummary\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\tcity\n\t\t\t\tvenue\n\t\t\t\tdate\n\t\t\t\tcapacity\n\t\t\t\tjoinedCount\n\t\t\t\twaitingCount\n\t\t\t\tstatus\n\t\t\t\tparticipation\n\t\t\t\ttags\n\t\t\t\thost {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t}\n\t\t\tliveRoom {\n\t\t\t\tid\n\t\t\t\tchannelID\n\t\t\t\ttitle\n\t\t\t\tsubtitle\n\t\t\t\tparticipantCount\n\t\t\t\tparticipants {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t}\n\t\t\tchannelPulse {\n\t\t\t\tchannelID\n\t\t\t\tchannelName\n\t\t\t\taccentName\n\t\t\t\tsummary\n\t\t\t\tnewPostCount\n\t\t\t\tpreviews {\n\t\t\t\t\tid\n\t\t\t\t\tauthorName\n\t\t\t\t\tsnippet\n\t\t\t\t}\n\t\t\t}\n\t\t\tfriendActivity {\n\t\t\t\tid\n\t\t\t\tactor {\n\t\t\t\t\tid\n\t\t\t\t\tfullName\n\t\t\t\t\tcity\n\t\t\t\t\tavatarURL\n\t\t\t\t}\n\t\t\t\ttext\n\t\t\t\tsystemImage\n\t\t\t\ttargetID\n\t\t\t}\n\t\t}\n\t\tnextCursor\n\t\trefreshCursor\n\t\tgeneratedAt\n\t}\n}\n"
+    },
+    {
       "id": "7ab5616db8305ce11da097524a803e950945d40bd82663055a2d65494a34a945",
       "name": "EMSIViewer",
       "file": "operations/Viewer.graphql",

@@ -1,4 +1,4 @@
-schema: ../../../../emsi_go_api/internal/graph/schema.graphqls
+schema: ../../../../backend/go-api/internal/graph/schema.graphqls
 operations:
   - ./operations/**/*.graphql
 manifest:

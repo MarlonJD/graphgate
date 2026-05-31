@@ -1,0 +1,100 @@
+query EMSIHomeFeed($mode: HomeFeedMode = FOR_YOU, $cursor: String) {
+  homeFeed(mode: $mode, cursor: $cursor) {
+    items {
+      type
+      id
+      reason {
+        key
+        args
+        text
+        systemImage
+      }
+      controls
+      trackingToken
+      post {
+        id
+        channelID
+        channelName
+        author {
+          id
+          fullName
+          city
+          avatarURL
+        }
+        body
+        createdAt
+        likeCount
+        replyCount
+        isLiked
+        mediaURL
+        mediaKind
+        thumbnailURL
+        blurhash
+        width
+        height
+      }
+      event {
+        id
+        title
+        summary
+        channelID
+        channelName
+        city
+        venue
+        date
+        capacity
+        joinedCount
+        waitingCount
+        status
+        participation
+        tags
+        host {
+          id
+          fullName
+          city
+          avatarURL
+        }
+      }
+      liveRoom {
+        id
+        channelID
+        title
+        subtitle
+        participantCount
+        participants {
+          id
+          fullName
+          city
+          avatarURL
+        }
+      }
+      channelPulse {
+        channelID
+        channelName
+        accentName
+        summary
+        newPostCount
+        previews {
+          id
+          authorName
+          snippet
+        }
+      }
+      friendActivity {
+        id
+        actor {
+          id
+          fullName
+          city
+          avatarURL
+        }
+        text
+        systemImage
+        targetID
+      }
+    }
+    nextCursor
+    refreshCursor
+    generatedAt
+  }
+}
