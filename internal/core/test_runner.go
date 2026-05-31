@@ -631,7 +631,7 @@ func ensureFixtureCoverage(cfg *config.Config, files []string, operations map[st
 	if cfg.Tests.RequireOperationCoverage {
 		failures = append(failures, missingOperationCoverage(cfg, files, coverageOperations, false)...)
 	}
-	if cfg.Tests.Coverage.RequirePositiveFixture {
+	if cfg.Tests.Coverage.RequirePositiveFixture && !negativeSelection(selection) {
 		failures = append(failures, missingOperationCoverage(cfg, files, coverageOperations, true)...)
 	}
 	if len(cfg.Tests.Coverage.RequireTags) > 0 {
@@ -645,6 +645,13 @@ func ensureFixtureCoverage(cfg *config.Config, files []string, operations map[st
 	}
 	sort.Strings(failures)
 	return failures
+}
+
+func negativeSelection(selection FixtureSelection) bool {
+	tags := stringSet(selection.Tags)
+	_, hasNegative := tags["negative"]
+	_, hasPositive := tags["positive"]
+	return hasNegative && !hasPositive
 }
 
 func selectedOperationUniverse(cfg *config.Config, files []string, operations map[string]Operation) map[string]Operation {

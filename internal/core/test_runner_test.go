@@ -324,6 +324,36 @@ func TestRunContractTestsRetriesConfiguredFailureClasses(t *testing.T) {
 	}
 }
 
+func TestRunContractTestsAllowsExplicitNegativeSelectionWithPositiveCoverageGate(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{"errors":[{"message":"forbidden","extensions":{"code":"FORBIDDEN"}}]}`))
+	}))
+	defer server.Close()
+
+	dir := t.TempDir()
+	writeProjectFile(t, dir, "schema.graphql", "type Query { viewer: User! }\ntype User { id: ID! }\n")
+	writeProjectFile(t, dir, "operations/GetViewer.graphql", "query GetViewer { viewer { id } }\n")
+	writeProjectFile(t, dir, "graphgate/fixtures/positive.json", `{"operation":"GetViewer","tags":["positive"]}`)
+	writeProjectFile(t, dir, "graphgate/fixtures/negative.json", `{"operation":"GetViewer","tags":["negative","security"],"expectedErrorCodes":["FORBIDDEN"]}`)
+	cfgData := "schema: ./schema.graphql\noperations:\n  - ./operations/**/*.graphql\nmanifest:\n  format: graphgate\n  output: ./graphgate.manifest.json\nenvironments:\n  local:\n    endpoint: " + server.URL + "\ntests:\n  fixtures: ./graphgate/fixtures/**/*.json\n  coverage:\n    requirePositiveFixture: true\n"
+	cfgPath := filepath.Join(dir, config.DefaultConfigPath)
+	if err := os.WriteFile(cfgPath, []byte(cfgData), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	cfg, err := config.Load(cfgPath)
+	if err != nil {
+		t.Fatalf("config.Load() error = %v", err)
+	}
+
+	result, err := RunContractTests(context.Background(), cfg, TestOptions{Environment: "local", Tags: []string{"negative", "security"}, Timeout: time.Second})
+	if err != nil {
+		t.Fatalf("RunContractTests() error = %v", err)
+	}
+	if !result.OK || result.Passed != 1 || result.FailureClass == FailureClassCoverage {
+		t.Fatalf("result = %#v", result)
+	}
+}
+
 func TestEvaluateAssertionSupportsWildcardAndArrayOperators(t *testing.T) {
 	decoded := map[string]any{
 		"data": map[string]any{
