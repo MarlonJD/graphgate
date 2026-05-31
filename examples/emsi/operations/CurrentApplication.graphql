@@ -1,0 +1,40 @@
+query EMSICurrentApplication {
+  currentApplication {
+    period {
+      id
+      slug
+      title
+      state
+      opensAt
+      closesAt
+      applicationVersion
+      createdAt
+      updatedAt
+    }
+    application {
+      id
+      periodID
+      applicantUserID
+      state
+      answers {
+        key
+        label
+        value
+        valueType
+        group
+        displayOrder
+        required
+        sensitive
+      }
+      applicantCopy
+      submittedAt
+      decidedAt
+      createdAt
+      updatedAt
+    }
+    state
+    displayState
+    message
+    access
+  }
+}

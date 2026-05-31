@@ -1,0 +1,62 @@
+query EMSIUserPosts($userID: ID, $username: String, $limit: Int = 30) {
+  userPosts(userID: $userID, username: $username, limit: $limit) {
+    id
+    legacyPostID
+    channelID
+    parentPostID
+    author {
+      id
+      legacyUserID
+      username
+      usernameColor
+      pictureURL
+    }
+    content
+    attachmentURL
+    thumbnailURL
+    blurhash
+    width
+    height
+    replyCount
+    replyPreview {
+      id
+      legacyPostID
+      channelID
+      parentPostID
+      author {
+        id
+        legacyUserID
+        username
+        usernameColor
+        pictureURL
+      }
+      content
+      attachmentURL
+      thumbnailURL
+      blurhash
+      width
+      height
+      replyCount
+      reactionSummary {
+        emojiID
+        key
+        unified
+        url
+        count
+        updatedAt
+      }
+      createdAt
+      updatedAt
+    }
+    reactionSummary {
+      emojiID
+      key
+      unified
+      url
+      count
+      updatedAt
+    }
+    createdAt
+    updatedAt
+  }
+}

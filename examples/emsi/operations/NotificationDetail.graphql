@@ -1,0 +1,12 @@
+query EMSINotificationDetail($id: ID!) {
+  notificationDetail(id: $id) {
+    id
+    type
+    targetID
+    title
+    body
+    route
+    isRead
+    createdAt
+  }
+}

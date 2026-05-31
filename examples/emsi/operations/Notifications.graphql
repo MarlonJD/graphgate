@@ -1,0 +1,12 @@
+query EMSINotifications($lastNotificationID: ID, $limit: Int = 100) {
+  notifications(lastNotificationID: $lastNotificationID, limit: $limit) {
+    id
+    type
+    targetID
+    title
+    body
+    route
+    isRead
+    createdAt
+  }
+}

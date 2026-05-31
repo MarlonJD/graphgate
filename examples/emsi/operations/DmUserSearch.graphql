@@ -1,0 +1,9 @@
+query EMSIDmUserSearch($searchText: String!) {
+  dmUserSearch(searchText: $searchText) {
+    id
+    username
+    fullName
+    city
+    pictureURL
+  }
+}

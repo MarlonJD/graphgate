@@ -1,0 +1,25 @@
+query EMSIEventDetail($id: ID!) {
+  eventDetail(id: $id) {
+    id
+    title
+    summary
+    channelID
+    channelName
+    city
+    venue
+    date
+    capacity
+    joinedCount
+    waitingCount
+    isCancelled
+    isFull
+    participation
+    tags
+    host {
+      id
+      fullName
+      city
+      avatarURL
+    }
+  }
+}

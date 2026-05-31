@@ -1,0 +1,32 @@
+query EMSIStoryRail($surface: String = "home", $channelID: ID, $eventID: ID, $limit: Int = 20) {
+  storyRail(surface: $surface, channelID: $channelID, eventID: $eventID, limit: $limit) {
+    id
+    authorUserID
+    authorUsername
+    storyType
+    caption
+    mediaURL
+    mediaType
+    targetType
+    targetID
+    targetKey
+    state
+    seen
+    viewerReaction {
+      storyID
+      emojiID
+      key
+      unified
+      url
+      createdAt
+      updatedAt
+    }
+    replyCount
+    canHide
+    canReport
+    shareURL
+    createdAt
+    expiresAt
+    updatedAt
+  }
+}

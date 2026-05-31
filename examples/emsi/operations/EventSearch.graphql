@@ -1,0 +1,25 @@
+query EMSIEventSearch($searchText: String = "") {
+  eventSearch(searchText: $searchText) {
+    id
+    title
+    summary
+    channelID
+    channelName
+    city
+    venue
+    date
+    capacity
+    joinedCount
+    waitingCount
+    isCancelled
+    isFull
+    participation
+    tags
+    host {
+      id
+      fullName
+      city
+      avatarURL
+    }
+  }
+}

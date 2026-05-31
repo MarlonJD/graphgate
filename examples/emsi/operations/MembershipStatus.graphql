@@ -1,0 +1,9 @@
+query EMSIMembershipStatus {
+  membershipStatus {
+    isMembershipExpired
+    isGuestUser
+    hasActiveDonation
+    isDonationExempt
+    statusMessage
+  }
+}
